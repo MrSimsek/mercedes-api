@@ -6,13 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mercedes Challenge</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display|Roboto" rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #000;
+            font-family: 'Roboto', sans-serif;
+            color: white;
+        }
+
+        hr {
+            border-color: white;
+        }
+
+        .jumbotron {
+            background-color: #000000;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+        }
+    </style>
 </head>
 
 <body>
-    <a
-        href="https://api.secure.mercedes-benz.com/oidc10/auth/oauth/v2/authorize?response_type=code&client_id=b8bb6ba5-0467-4af7-b793-cf31c8f682f4&redirect_uri=http://localhost:8080/oauth/redirect&scope=mb:vehicle:status:general mb:user:pool:reader">
-        Login with Mercedes
-    </a>
+    <div class="jumbotron mx-auto">
+        <h1 class="display-4">Mercedes-Benz Code Challange</h1>
+        <p class="lead mt-4">
+            This a challenge by Mercedes-Benz. With this application an owner can see car details
+            and
+            lock/unlock the doors.</p>
+        <hr class="my-4">
+        <p>In order to use the application, you must authenticate with your Mercedes Me account.</p>
+        <a class="cta btn btn-light btn-lg" role="button"
+            href="https://api.secure.mercedes-benz.com/oidc10/auth/oauth/v2/authorize?response_type=code&client_id=b8bb6ba5-0467-4af7-b793-cf31c8f682f4&redirect_uri=http://localhost:8080/oauth/redirect&scope=mb:vehicle:status:general mb:user:pool:reader">
+            <svg class="mr-2" xml:space="preserve" width="35px" height="35px" version="1.1" viewBox="0 0 512 512"
+                shape-rendering="geometricPrecision" text-rendering="geometricPrecision"
+                image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd">
+                <path class="fil0"
+                    d="M261 5c135 0 244 109 244 244S396 493 261 493 17 384 17 249 126 5 261 5zm4 23l32 191 158 136c18-32 28-68 28-107 0-121-97-219-217-221zm188 330l-193-68-189 71c39 65 109 108 190 108 82 0 154-45 192-112zm-384 0l157-134 31-196C137 30 40 128 40 249c0 40 11 77 29 110z"
+                    fill="#000" id="Layer_x0020_1" />
+            </svg>
+            Login with Mercedes
+        </a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
