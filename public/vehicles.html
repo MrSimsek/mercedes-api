@@ -7,8 +7,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vehicles</title>
     <style>
-        #vehicles .item { cursor: pointer; }
-        #door-states .item { cursor: pointer; }
+        #vehicles .item {
+            cursor: pointer;
+        }
+
+        #door-states .item {
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -22,31 +27,6 @@
     <script src="https://code.jquery.com/jquery-3.4.0.min.js"
         integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
     <script>
-        /*         $(document).ready(function () {
-                    console.log('ready');
-        
-                    $.ajax({
-                        url: "https://api.mercedes-benz.com/experimental/connectedvehicle/v1/vehicles",
-                        method: "GET",
-                        xhrFields: {
-                            withCredentials: true
-                        },
-                        contentType: "application/json",
-                        beforeSend: function (xhr) {
-                            xhr.setRequestHeader("Authorization", "Bearer " + token);
-                        },
-                        success: function (data) {
-                            data.forEach(vehicle => {
-                                $("#vehicles").append(`<li>${vehicle.licenseplate}</li>`);
-                            });
-                        },
-                        error: function (jqXHR, textStatus, errorThrown) {
-                            console.log('Error');
-                        }
-                    });
-        
-                }); */
-
         // const query = window.location.search.substring(1);
         // const token = query.split('access_token=')[1];
 
@@ -79,7 +59,7 @@
             }
         });
 
-        doorStatesList.addEventListener('click', function(event) {
+        doorStatesList.addEventListener('click', function (event) {
             if (event.target && event.target.matches("li.item")) {
                 const vehicleId = event.target.getAttribute('data-id');
                 lockDoors(vehicleId);
