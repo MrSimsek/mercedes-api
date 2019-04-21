@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vehicles</title>
+    <style>
+        #vehicles .item { cursor: pointer; }
+        #door-states .item { cursor: pointer; }
+    </style>
+</head>
+
+<body>
+    <h2>Vehicles</h2>
+    <ul id="vehicles"></ul>
+    <h3>Vehicle Details</h3>
+    <ul id="vehicle-details"></ul>
+    <h4>Door States</h4>
+    <ul id="door-states"></ul>
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"
+        integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+    <script>
+        /*         $(document).ready(function () {
+                    console.log('ready');
+        
+                    $.ajax({
+                        url: "https://api.mercedes-benz.com/experimental/connectedvehicle/v1/vehicles",
+                        method: "GET",
+                        xhrFields: {
+                            withCredentials: true
+                        },
+                        contentType: "application/json",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + token);
+                        },
+                        success: function (data) {
+                            data.forEach(vehicle => {
+                                $("#vehicles").append(`<li>${vehicle.licenseplate}</li>`);
+                            });
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.log('Error');
+                        }
+                    });
+        
+                }); */
+
+        // const query = window.location.search.substring(1);
+        // const token = query.split('access_token=')[1];
+
+        const vehiclesList = document.getElementById('vehicles');
+        const vehicleDetailsList = document.getElementById('vehicle-details');
+        const doorStatesList = document.getElementById('door-states');
+
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "/vehicles/?access_token=e4e5056c-c063-4511-9dc8-10fa76dbee5b", true);
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                const vehicles = JSON.parse(this.responseText);
+                vehicles.forEach(vehicle => {
+                    let listItem = document.createElement('li');
+                    let a = document.createElement('a');
+                    listItem.setAttribute('data-id', vehicle.id);
+                    listItem.innerText = vehicle.licenseplate;
+                    listItem.classList.add('item');
+                    vehiclesList.appendChild(listItem);
+                });
+            }
+        };
+        xhttp.send();
+
+        vehiclesList.addEventListener("click", function (event) {
+            if (event.target && event.target.matches("li.item")) {
+                const vehicleId = event.target.getAttribute('data-id');
+                fetchVehicle(vehicleId);
+                getVehicleDoors(vehicleId);
+            }
+        });
+
+        doorStatesList.addEventListener('click', function(event) {
+            if (event.target && event.target.matches("li.item")) {
+                const vehicleId = event.target.getAttribute('data-id');
+                lockDoors(vehicleId);
+            }
+        });
+
+        function fetchVehicle(id) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/vehicles/" + id + "?access_token=e4e5056c-c063-4511-9dc8-10fa76dbee5b", true);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const vehicle = JSON.parse(this.responseText);
+                    Object.values(vehicle).forEach(value => {
+                        let listItem = document.createElement('li');
+                        listItem.classList.add('item');
+                        listItem.innerText = value;
+                        vehicleDetailsList.appendChild(listItem);
+                    });
+                }
+            };
+            xhttp.send();
+        }
+
+        function getVehicleDoors(id) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "/vehicles/" + id + "/doors" + "?access_token=e4e5056c-c063-4511-9dc8-10fa76dbee5b", true);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const vehicle = JSON.parse(this.responseText);
+                    doorStatesList.innerHTML = "";
+                    Object.values(vehicle).forEach(value => {
+                        let listItem = document.createElement('li');
+                        listItem.setAttribute('data-id', id);
+                        listItem.classList.add('item');
+                        listItem.innerText = value.value + " " + value.retrievalstatus + " " + value.timestamp;
+                        doorStatesList.appendChild(listItem);
+                    });
+                }
+            };
+            xhttp.send();
+        }
+
+        function lockDoors(id) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/vehicles/" + id + "/doors" + "?access_token=e4e5056c-c063-4511-9dc8-10fa76dbee5b&command=LOCK", true);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const status = JSON.parse(this.responseText);
+                    console.log(status);
+                }
+            };
+            xhttp.send();
+        }
+
+        function unlockDoors(id) {
+            const xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/vehicles/" + id + "/doors" + "?access_token=e4e5056c-c063-4511-9dc8-10fa76dbee5b&command=UNLOCK", true);
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    const status = JSON.parse(this.responseText);
+                    console.log(status);
+                }
+            };
+            xhttp.send();
+        }
+    </script>
+</body>
+
+</html>

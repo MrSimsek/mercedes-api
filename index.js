@@ -2,14 +2,20 @@ require("dotenv").config();
 
 const express = require("express");
 const request = require("request");
+const cors = require("cors");
 
 const app = express();
+
+const vehiclesUrl =
+  "https://api.mercedes-benz.com/experimental/connectedvehicle/v1/vehicles";
+
 app.use(express.static(__dirname + "/public"));
+app.use(cors());
 
 app.get("/oauth/redirect", (req, res) => {
   const requestToken = req.query.code;
 
-  var options = {
+  const options = {
     method: "POST",
     url: "https://api.secure.mercedes-benz.com/oidc10/auth/oauth/v2/token",
     headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -25,46 +31,95 @@ app.get("/oauth/redirect", (req, res) => {
 
   request(options, function(error, response, body) {
     if (error) throw new Error(error);
-    console.log(body);
 
     const accessToken = body.access_token;
-    var options = {
-      method: "GET",
-      url:
-        "https://api.mercedes-benz.com/experimental/connectedvehicle/v1/vehicles/",
-      headers: {
-        authorization: "Bearer " + accessToken,
-        "content-type": "application/json"
-      }
-    };
-
-    request(options, function(error, response, body) {
-      if (error) throw new Error(error);
-      console.log(JSON.parse(body));
-      var parsedBody = JSON.parse(body);
-
-      const vehicleId = parsedBody[0].id;
-      var options = {
-        method: "GET",
-        url:
-          "https://api.mercedes-benz.com/experimental/connectedvehicle/v1/vehicles/" +
-          vehicleId,
-        headers: {
-          authorization: "Bearer " + accessToken,
-          "content-type": "application/json"
-        }
-      };
-
-      request(options, function(error, response, body) {
-        if (error) throw new Error(error);
-        console.log(body);
-      });
-    });
+    res.redirect(`/vehicles.html?access_token=${accessToken}`);
   });
 });
 
-app.get("/unlock", (req, res) => {});
+app.get("/vehicles", (req, res) => {
+  const accessToken = req.query.access_token;
 
-app.get("/lock", (req, res) => {});
+  const options = {
+    method: "GET",
+    url: vehiclesUrl,
+    headers: {
+      authorization: "Bearer " + accessToken,
+      "content-type": "application/json"
+    }
+  };
 
-app.listen(8080, () => console.log("Server is open at 8080"));
+  request(options, function(error, response, body) {
+    if (error) throw new Error(error);
+
+    res.send(body);
+  });
+});
+
+app.get("/vehicles/:vehicleId", (req, res) => {
+  const vehicleId = req.params.vehicleId;
+  const accessToken = req.query.access_token;
+
+  const options = {
+    method: "GET",
+    url: vehiclesUrl + "/" + vehicleId,
+    headers: {
+      authorization: "Bearer " + accessToken,
+      "content-type": "application/json"
+    }
+  };
+
+  request(options, function(error, response, body) {
+    if (error) throw new Error(error);
+
+    res.send(body);
+  });
+});
+
+app.get("/vehicles/:vehicleId/doors", (req, res) => {
+  const vehicleId = req.params.vehicleId;
+  const accessToken = req.query.access_token;
+
+  const options = {
+    method: "GET",
+    url: vehiclesUrl + "/" + vehicleId + '/doors',
+    headers: {
+      authorization: "Bearer " + accessToken,
+      "content-type": "application/json"
+    }
+  };
+
+  request(options, function(error, response, body) {
+    if (error) throw new Error(error);
+
+    res.send(body);
+  });
+});
+
+app.post("/vehicles/:vehicleId/doors", (req, res) => {
+  const vehicleId = req.params.vehicleId;
+  const accessToken = req.query.access_token;
+  const command = req.query.command;
+
+  const dataString = `{ "command": "${command}"}`;
+
+  const options = {
+    method: "POST",
+    url: vehiclesUrl + "/" + vehicleId + '/doors',
+    headers: {
+      authorization: "Bearer " + accessToken,
+      "content-type": "application/json"
+    },
+    body: dataString
+  };
+
+  request(options, function(error, response, body) {
+    if (error) throw new Error(error);
+
+    res.send(body);
+  });
+});
+
+app.listen(process.env.PORT, () =>
+  console.log(`Server is opened at ${process.env.PORT}`)
+);
