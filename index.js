@@ -103,7 +103,7 @@ app.post('/vehicles/:vehicleId/doors', (req, res) => {
   const accessToken = req.query.access_token
   const command = req.query.command
 
-  const dataString = `{ 'command': '${command}'}`
+  const dataString = `{ "command": "${command}"}`
 
   const options = {
     method: 'POST',
@@ -112,7 +112,7 @@ app.post('/vehicles/:vehicleId/doors', (req, res) => {
       authorization: 'Bearer ' + accessToken,
       'content-type': 'application/json'
     },
-    body: dataString
+    form: dataString
   }
 
   request(options, function (error, response, body) {
