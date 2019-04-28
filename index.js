@@ -5,6 +5,7 @@ const path = require('path')
 const express = require('express')
 const request = require('request')
 const cors = require('cors')
+const session = require('express-session')
 
 const app = express()
 
@@ -13,6 +14,14 @@ const vehiclesUrl =
 
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
+
+// If secure set to true the cookie will only be set with HTTPS
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false }
+}))
 
 app.get('/oauth/redirect', (req, res) => {
   const requestToken = req.query.code
@@ -35,13 +44,14 @@ app.get('/oauth/redirect', (req, res) => {
     if (error) throw new Error(error)
 
     const accessToken = body.access_token
-    res.redirect(`/vehicles.html?access_token=${accessToken}`)
+    req.session.accessToken = accessToken
+    res.redirect('/vehicles.html')
   })
 })
 
 app.get('/vehicles', (req, res) => {
-  const accessToken = req.query.access_token
-
+  const accessToken = req.session.accessToken
+  
   const options = {
     method: 'GET',
     url: vehiclesUrl,
@@ -60,7 +70,7 @@ app.get('/vehicles', (req, res) => {
 
 app.get('/vehicles/:vehicleId', (req, res) => {
   const vehicleId = req.params.vehicleId
-  const accessToken = req.query.access_token
+  const accessToken = req.session.accessToken
 
   const options = {
     method: 'GET',
@@ -80,7 +90,7 @@ app.get('/vehicles/:vehicleId', (req, res) => {
 
 app.get('/vehicles/:vehicleId/doors', (req, res) => {
   const vehicleId = req.params.vehicleId
-  const accessToken = req.query.access_token
+  const accessToken = req.session.accessToken
 
   const options = {
     method: 'GET',
@@ -100,7 +110,7 @@ app.get('/vehicles/:vehicleId/doors', (req, res) => {
 
 app.post('/vehicles/:vehicleId/doors', (req, res) => {
   const vehicleId = req.params.vehicleId
-  const accessToken = req.query.access_token
+  const accessToken = req.session.accessToken
   const command = req.query.command
 
   const dataString = `{ "command": "${command}"}`

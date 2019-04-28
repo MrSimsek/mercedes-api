@@ -13,7 +13,8 @@
   "dependencies": {
     "axios": "^0.18.0",
     "cors": "^2.8.5",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "express-session": "^1.16.1"
   },
   "devDependencies": {
     "base-64": "^0.1.0",

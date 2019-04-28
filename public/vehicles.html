@@ -6,12 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vehicles</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display|Roboto" rel="stylesheet">
     <style>
         body {
-            background-color: #000;
+            color: white;
         }
 
         h1 {
@@ -31,32 +30,35 @@
 
 <body class="my-4">
     <div class="container">
-        <h1 class="display-4 my-4">Vehicles</h1>
-        <ul id="vehicles" class="list-group"></ul>
-        <h1 class="display-5 my-4">Vehicle Details</h1>
-        <ul id="vehicle-details" class="list-group"></ul>
-        <h1 class="display-6 my-4">Door States</h1>
-        <ul id="door-states" class="list-group"></ul>
+        <div id="vehicles-wrapper">
+            <h1 class="display-4 my-4">Vehicles</h1>
+            <ul id="vehicles" class="list-group"></ul>
+        </div>
+        <div id="vehicle-details-wrapper" class="d-none">
+            <h1 class="display-4 my-4">Vehicle Details</h1>
+            <ul id="vehicle-details" class="list-group"></ul>
+        </div>
+        <div id="door-states-wrapper" class="d-none">
+            <h1 class="display-4 my-4">Door States</h1>
+            <ul id="door-states" class="list-group"></ul>
+        </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script>
         const query = window.location.search.substring(1);
-        const token = query.split('access_token=')[1];
+
+        const vehiclesListWrapper = document.getElementById('vehicles-wrapper');
+        const vehicleDetailsListWrapper = document.getElementById('vehicle-details-wrapper');
+        const doorStatesListWrapper = document.getElementById('door-states-wrapper');
 
         const vehiclesList = document.getElementById('vehicles');
         const vehicleDetailsList = document.getElementById('vehicle-details');
         const doorStatesList = document.getElementById('door-states');
 
         const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "/vehicles/?access_token=" + token, true);
+        xhttp.open("GET", "/vehicles", true);
         xhttp.onreadystatechange = function () {
             if (this.readyState == 4 && this.status == 200) {
                 const vehicles = JSON.parse(this.responseText);
@@ -77,20 +79,23 @@
                 const vehicleId = event.target.getAttribute('data-id');
                 fetchVehicle(vehicleId);
                 getVehicleDoors(vehicleId);
-                setInterval(function() { getVehicleDoors(vehicleId) }, 10000);
+                vehicleDetailsListWrapper.classList.remove('d-none');
+                doorStatesListWrapper.classList.remove('d-none');
+                setInterval(function() { getVehicleDoors(vehicleId) }, 7000);
             }
         });
 
         doorStatesList.addEventListener('click', function (event) {
             if (event.target && event.target.matches("li.list-group-item")) {
                 const vehicleId = event.target.getAttribute('data-id');
-                controlDoors(vehicleId, "LOCK");
+                const doorCommand = event.target.getAttribute('data-command');
+                controlDoors(vehicleId, doorCommand);
             }
         });
 
         function fetchVehicle(id) {
             const xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/vehicles/" + id + "?access_token=" + token, true);
+            xhttp.open("GET", "/vehicles/" + id, true);
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     const vehicle = JSON.parse(this.responseText);
@@ -107,7 +112,7 @@
 
         function getVehicleDoors(id) {
             const xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "/vehicles/" + id + "/doors" + "?access_token=" + token, true);
+            xhttp.open("GET", "/vehicles/" + id + "/doors", true);
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     const doors = JSON.parse(this.responseText);
@@ -117,6 +122,8 @@
                         listItem.setAttribute('data-id', id);
                         listItem.classList.add('list-group-item');
                         listItem.innerText = key + " " + doors[key].value + " " + doors[key].retrievalstatus + " " + doors[key].timestamp;
+                        if(doors[key].value === 'LOCKED') listItem.setAttribute('data-command', 'UNLOCK');
+                        if(doors[key].value === 'UNLOCKED') listItem.setAttribute('data-command', 'LOCK');
                         doorStatesList.appendChild(listItem);
                     });
                 }
@@ -126,7 +133,7 @@
 
         function controlDoors(id, command) {
             const xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/vehicles/" + id + "/doors" + "?access_token=" + token + "&command=" + command, true);
+            xhttp.open("POST", "/vehicles/" + id + "/doors" + "?command=" + command, true);
             xhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     const status = JSON.parse(this.responseText);
